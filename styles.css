@@ -4,42 +4,43 @@
    ======================================== */
 
 :root {
-    /* Core Colors - Teal/Cyan accent with deep dark theme */
-    --accent-primary: #00F5D4;
-    --accent-secondary: #7B2CBF;
-    --accent-tertiary: #F72585;
+    /* Core Colors - Premium minimal */
+    --accent-primary: #ffffff;
+    --accent-secondary: #e4e4e7;
+    --accent-tertiary: #a1a1aa;
     
     /* Background Colors */
-    --bg-deep: #0A0A0F;
-    --bg-primary: #0D0D14;
-    --bg-secondary: #14141F;
-    --bg-tertiary: #1A1A28;
-    --bg-elevated: #222233;
+    --bg-deep: #000000;
+    --bg-primary: #09090b;
+    --bg-secondary: #121214;
+    --bg-tertiary: #18181b;
+    --bg-elevated: rgba(24, 24, 27, 0.6);
     
     /* Text Colors */
-    --text-primary: #FFFFFF;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-tertiary: rgba(255, 255, 255, 0.4);
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
     
     /* Semantic Colors */
-    --success: #00F5D4;
-    --warning: #FFD60A;
-    --error: #F72585;
+    --success: #ffffff;
+    --warning: #facc15;
+    --error: #ef4444;
     
     /* Gradients */
-    --gradient-accent: linear-gradient(135deg, #00F5D4 0%, #7B2CBF 100%);
-    --gradient-glow: radial-gradient(ellipse at center, rgba(0, 245, 212, 0.15) 0%, transparent 70%);
+    --gradient-accent: linear-gradient(135deg, #ffffff 0%, #e4e4e7 100%);
+    --gradient-glow: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
     
     /* Spacing */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 32px;
+    --radius-pill: 9999px;
     
     /* Transitions */
     --transition-fast: 0.15s ease;
-    --transition-normal: 0.25s ease;
-    --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reset & Base */
@@ -78,8 +79,8 @@ body {
     position: fixed;
     inset: 0;
     background: 
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(123, 44, 191, 0.25) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0, 245, 212, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
         var(--bg-deep);
     z-index: 0;
 }
@@ -141,12 +142,9 @@ body {
 
 .logo-text {
     font-size: 1.25rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
 }
 
 .header-stats {
@@ -163,7 +161,7 @@ body {
 
 .stat-label {
     font-size: 0.7rem;
-    font-weight: 500;
+    font-weight: 300;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-tertiary);
@@ -172,7 +170,7 @@ body {
 .stat-value {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 300;
     color: var(--accent-primary);
     transition: color var(--transition-normal);
 }
@@ -242,13 +240,10 @@ body {
 
 .title {
     font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-weight: 300;
+    letter-spacing: -0.02em;
     margin-bottom: 12px;
-    background: linear-gradient(135deg, #fff 30%, var(--accent-primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
 }
 
 .subtitle {
@@ -263,16 +258,18 @@ body {
     align-items: center;
     gap: 12px;
     padding: 8px;
-    background: var(--bg-secondary);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-lg);
+    background: rgba(18, 18, 20, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-pill);
     transition: all var(--transition-normal);
 }
 
 .url-input-wrapper:focus-within {
     border-color: var(--accent-primary);
     box-shadow: 
-        0 0 0 4px rgba(0, 245, 212, 0.1),
+        0 0 0 4px rgba(255, 255, 255, 0.05),
         0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
@@ -312,10 +309,10 @@ body {
     padding: 16px 28px;
     background: var(--gradient-accent);
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-pill);
     font-family: inherit;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--bg-deep);
     cursor: pointer;
     transition: all var(--transition-normal);
@@ -329,7 +326,7 @@ body {
 
 .play-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 245, 212, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
 }
 
 .play-btn:active {
@@ -361,8 +358,10 @@ body {
 .proxy-slider {
     position: absolute;
     inset: 0;
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     transition: all var(--transition-normal);
 }
@@ -410,7 +409,7 @@ body {
     border-radius: 100px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 300;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -580,7 +579,7 @@ body {
     width: 100px;
     height: 100px;
     background: rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     color: var(--text-primary);
     cursor: pointer;
@@ -596,8 +595,8 @@ body {
     background: var(--accent-primary);
     border-color: var(--accent-primary);
     color: var(--bg-deep);
-    transform: scale(1.1);
-    box-shadow: 0 0 40px rgba(0, 245, 212, 0.4);
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
 }
 
 /* Controls */
@@ -607,7 +606,7 @@ body {
     right: 0;
     bottom: 0;
     padding: 60px 20px 20px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
     opacity: 0;
     transform: translateY(10px);
     transition: all var(--transition-normal);
@@ -623,16 +622,16 @@ body {
 /* Progress Bar */
 .progress-container {
     position: relative;
-    height: 6px;
+    height: 4px;
     background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
+    border-radius: 2px;
     margin-bottom: 16px;
     cursor: pointer;
     transition: height var(--transition-fast);
 }
 
 .progress-container:hover {
-    height: 10px;
+    height: 6px;
 }
 
 .progress-buffer {
@@ -671,13 +670,13 @@ body {
 .progress-thumb {
     position: absolute;
     top: 50%;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     background: var(--accent-primary);
     border-radius: 50%;
     transform: translate(-50%, -50%) scale(0);
     transition: transform var(--transition-fast);
-    box-shadow: 0 2px 8px rgba(0, 245, 212, 0.4);
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
 }
 
 .progress-container:hover .progress-thumb {
@@ -804,7 +803,7 @@ body {
     background: var(--accent-primary);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 245, 212, 0.3);
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
 }
 
 .volume-fill {
@@ -884,14 +883,14 @@ body {
     border-radius: var(--radius-sm);
     font-family: inherit;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--bg-deep);
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 
 .time-go-btn:hover {
-    background: #00dfc0;
+    background: #e4e4e7;
 }
 
 @keyframes shake {
@@ -1030,14 +1029,14 @@ body {
     border-radius: var(--radius-sm);
     font-family: inherit;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--bg-deep);
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 
 .custom-speed-btn:hover {
-    background: #00dfc0;
+    background: #e4e4e7;
 }
 
 /* Speed Warning */
@@ -1109,12 +1108,14 @@ body {
 
 .retry-btn {
     padding: 12px 24px;
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 300;
     color: var(--text-primary);
     cursor: pointer;
     transition: all var(--transition-normal);
@@ -1191,7 +1192,7 @@ body {
 
 .shortcuts-content h3 {
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: 300;
     margin-bottom: 24px;
     text-align: center;
     color: var(--text-primary);
@@ -1214,8 +1215,10 @@ body {
 .shortcut kbd {
     min-width: 40px;
     padding: 6px 12px;
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-sm);
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.8rem;
@@ -1238,7 +1241,7 @@ body {
     border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--bg-deep);
     cursor: pointer;
     transition: all var(--transition-normal);
@@ -1246,7 +1249,7 @@ body {
 
 .close-shortcuts:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 245, 212, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
 }
 
 /* Responsive */
@@ -1336,7 +1339,7 @@ body {
     color: var(--text-primary);
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: 300;
     opacity: 0;
     transition: opacity 0.2s ease;
     pointer-events: none;
