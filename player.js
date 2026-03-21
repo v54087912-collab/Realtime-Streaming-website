@@ -44,6 +44,15 @@ class StreamFlowPlayer {
         this.audioBtn = document.getElementById('audioBtn');
         this.audioMenu = document.getElementById('audioMenu');
 
+        // Settings Controls
+        this.settingsContainer = document.getElementById('settingsContainer');
+        this.settingsBtn = document.getElementById('settingsBtn');
+        this.settingsMenu = document.getElementById('settingsMenu');
+        this.aspectRatioOption = document.getElementById('aspectRatioOption');
+        this.aspectRatioValue = document.getElementById('aspectRatioValue');
+        this.loopToggle = document.getElementById('loopToggle');
+        this.loopOption = document.getElementById('loopOption');
+
         this.speedBtn = document.getElementById('speedBtn');
         this.speedMenu = document.getElementById('speedMenu');
         this.speedValue = document.getElementById('speedValue');
@@ -83,6 +92,10 @@ class StreamFlowPlayer {
         this.loadStartTime = 0;
         this.bytesLoaded = 0;
         
+        // Settings State
+        this.aspectRatios = ['Fit', 'Fill', 'Cover'];
+        this.currentAspectRatioIdx = 0;
+
         // Buffer Management
         this.bufferCheckInterval = null;
         this.targetBufferAhead = 60; // seconds to buffer ahead
@@ -198,14 +211,39 @@ class StreamFlowPlayer {
                 e.stopPropagation();
                 if (this.audioMenu) this.audioMenu.classList.toggle('active');
                 if (this.speedMenu) this.speedMenu.classList.remove('active');
+                if (this.settingsMenu) this.settingsMenu.classList.remove('active');
             });
         }
+
+        // Settings Menu
+        this.settingsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.settingsMenu.classList.toggle('active');
+            if (this.audioMenu) this.audioMenu.classList.remove('active');
+            if (this.speedMenu) this.speedMenu.classList.remove('active');
+        });
+
+        this.aspectRatioOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.cycleAspectRatio();
+        });
+
+        this.loopOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.loopToggle.checked = !this.loopToggle.checked;
+            this.video.loop = this.loopToggle.checked;
+        });
+
+        this.loopToggle.addEventListener('change', (e) => {
+            this.video.loop = e.target.checked;
+        });
 
         // Speed Menu
         this.speedBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.speedMenu.classList.toggle('active');
             if (this.audioMenu) this.audioMenu.classList.remove('active');
+            if (this.settingsMenu) this.settingsMenu.classList.remove('active');
         });
         
         document.querySelectorAll('.speed-option').forEach(option => {
@@ -245,9 +283,11 @@ class StreamFlowPlayer {
             });
         }
         
-        // Close speed menu when clicking outside
+        // Close menus when clicking outside
         document.addEventListener('click', () => {
             this.speedMenu.classList.remove('active');
+            if (this.audioMenu) this.audioMenu.classList.remove('active');
+            if (this.settingsMenu) this.settingsMenu.classList.remove('active');
         });
         
         // Shortcuts Modal
@@ -1045,6 +1085,24 @@ class StreamFlowPlayer {
         }, 2500);
     }
     
+    cycleAspectRatio() {
+        this.currentAspectRatioIdx = (this.currentAspectRatioIdx + 1) % this.aspectRatios.length;
+        const newAspect = this.aspectRatios[this.currentAspectRatioIdx];
+        this.aspectRatioValue.textContent = newAspect;
+
+        switch(newAspect) {
+            case 'Fit':
+                this.video.style.objectFit = 'contain';
+                break;
+            case 'Fill':
+                this.video.style.objectFit = 'fill';
+                break;
+            case 'Cover':
+                this.video.style.objectFit = 'cover';
+                break;
+        }
+    }
+
     toggleFullscreen() {
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
             if (this.playerContainer.requestFullscreen) {

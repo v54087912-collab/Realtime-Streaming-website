@@ -285,6 +285,29 @@
                                     </div>
                                 </div>
 
+                                <!-- Settings Menu -->
+                                <div class="settings-container" id="settingsContainer" style="position: relative;">
+                                    <button class="ctrl-btn settings-btn" id="settingsBtn" title="Settings">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="settings-menu" id="settingsMenu">
+                                        <div class="settings-option" id="aspectRatioOption" title="Aspect Ratio">
+                                            <span>Aspect Ratio</span>
+                                            <span class="settings-value" id="aspectRatioValue">Fit</span>
+                                        </div>
+                                        <div class="settings-option" id="loopOption" title="Toggle Loop">
+                                            <span>Loop</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="loopToggle">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Picture in Picture -->
                                 <button class="ctrl-btn" id="pipBtn" title="Picture in Picture (P)">
                                     <svg viewBox="0 0 24 24" fill="none">
