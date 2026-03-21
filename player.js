@@ -6,6 +6,11 @@
 class StreamFlowPlayer {
     constructor() {
         // DOM Elements
+        this.logoBtn = document.getElementById('logoBtn');
+        this.sidebarOverlay = document.getElementById('sidebarOverlay');
+        this.sidebar = document.getElementById('sidebar');
+        this.closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
         this.urlSection = document.getElementById('urlSection');
         this.playerSection = document.getElementById('playerSection');
         this.playerContainer = document.getElementById('playerContainer');
@@ -92,6 +97,16 @@ class StreamFlowPlayer {
         this.init();
     }
     
+    openSidebar() {
+        this.sidebar.classList.add('active');
+        this.sidebarOverlay.classList.add('active');
+    }
+
+    closeSidebar() {
+        this.sidebar.classList.remove('active');
+        this.sidebarOverlay.classList.remove('active');
+    }
+
     init() {
         this.bindEvents();
         this.setupVideoEvents();
@@ -110,6 +125,13 @@ class StreamFlowPlayer {
     }
     
     bindEvents() {
+        // Sidebar
+        if (this.logoBtn && this.sidebar && this.sidebarOverlay && this.closeSidebarBtn) {
+            this.logoBtn.addEventListener('click', () => this.openSidebar());
+            this.closeSidebarBtn.addEventListener('click', () => this.closeSidebar());
+            this.sidebarOverlay.addEventListener('click', () => this.closeSidebar());
+        }
+
         // URL Input
         this.loadBtn.addEventListener('click', () => this.loadVideo());
         this.urlInput.addEventListener('keypress', (e) => {
