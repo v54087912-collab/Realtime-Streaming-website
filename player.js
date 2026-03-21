@@ -351,9 +351,9 @@ class StreamFlowPlayer {
         // Check if proxy should be used
         const useProxy = this.useProxyCheckbox && this.useProxyCheckbox.checked;
         if (useProxy) {
-            // Use local proxy server (run server.js with node)
-            url = `http://localhost:4000/proxy?url=${encodeURIComponent(url)}`;
-            console.log('🔄 Using local proxy server for URL');
+            // Use proxy to bypass CORS (works via Cloudflare Pages Function or local server.js)
+            url = `/proxy?url=${encodeURIComponent(url)}`;
+            console.log('🔄 Using proxy server for URL');
         }
         
         this.currentUrl = url;
