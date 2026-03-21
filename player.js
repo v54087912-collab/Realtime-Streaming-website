@@ -38,6 +38,12 @@ class StreamFlowPlayer {
         this.volumeFill = document.getElementById('volumeFill');
         this.fullscreenBtn = document.getElementById('fullscreenBtn');
         this.pipBtn = document.getElementById('pipBtn');
+
+        // Audio Track Selection
+        this.audioContainer = document.getElementById('audioContainer');
+        this.audioBtn = document.getElementById('audioBtn');
+        this.audioMenu = document.getElementById('audioMenu');
+
         this.speedBtn = document.getElementById('speedBtn');
         this.speedMenu = document.getElementById('speedMenu');
         this.speedValue = document.getElementById('speedValue');
@@ -186,10 +192,20 @@ class StreamFlowPlayer {
             setTimeout(() => this.hideTimeInput(), 200);
         });
         
+        // Audio Track Menu
+        if (this.audioBtn) {
+            this.audioBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.audioMenu) this.audioMenu.classList.toggle('active');
+                if (this.speedMenu) this.speedMenu.classList.remove('active');
+            });
+        }
+
         // Speed Menu
         this.speedBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.speedMenu.classList.toggle('active');
+            if (this.audioMenu) this.audioMenu.classList.remove('active');
         });
         
         document.querySelectorAll('.speed-option').forEach(option => {
@@ -280,9 +296,19 @@ class StreamFlowPlayer {
             // Initialize speed status
             this.updateSpeedStatus();
             
+            // Check for audio tracks
+            this.updateAudioTracks();
+
             console.log(`Video loaded: ${this.formatTime(this.video.duration)} duration`);
         });
         
+        // Also listen for audio tracks changes (Safari/HLS)
+        if (this.video.audioTracks) {
+            this.video.audioTracks.addEventListener('addtrack', () => this.updateAudioTracks());
+            this.video.audioTracks.addEventListener('removetrack', () => this.updateAudioTracks());
+            this.video.audioTracks.addEventListener('change', () => this.updateAudioTracks());
+        }
+
         this.video.addEventListener('canplay', () => {
             this.hideLoading();
             this.playOverlay.classList.remove('hidden');
@@ -348,6 +374,14 @@ class StreamFlowPlayer {
             return;
         }
         
+        // Store original for display
+        this.originalUrl = url.trim();
+
+        // Handle common file locker URLs gracefully
+        if (url.includes('hubdrive.space/') || url.includes('mega.nz/')) {
+            alert("Note: It looks like you're trying to stream from a file locker site (like Mega or HubDrive). This player requires a DIRECT video link (e.g. ending in .mp4, .mkv). A link to a webpage or an encrypted download link will not work. You may need to generate a direct download link first.");
+        }
+
         // Check if proxy should be used
         const useProxy = this.useProxyCheckbox && this.useProxyCheckbox.checked;
         if (useProxy) {
@@ -1014,7 +1048,7 @@ class StreamFlowPlayer {
     toggleFullscreen() {
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
             if (this.playerContainer.requestFullscreen) {
-                this.playerContainer.requestFullscreen();
+                this.playerContainer.requestFullscreen().catch(err => console.error("Error attempting to enable full-screen mode:", err.message));
             } else if (this.playerContainer.webkitRequestFullscreen) {
                 this.playerContainer.webkitRequestFullscreen();
             }
@@ -1030,6 +1064,18 @@ class StreamFlowPlayer {
     onFullscreenChange() {
         this.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
         this.playerContainer.classList.toggle('fullscreen', this.isFullscreen);
+
+        // Attempt to lock/unlock landscape orientation on mobile devices
+        if (this.isFullscreen && screen.orientation && screen.orientation.lock) {
+            // Lock to landscape when entering fullscreen
+            screen.orientation.lock('landscape').catch((error) => {
+                // Ignore error if not supported or not allowed (e.g. desktop)
+                console.log('Orientation lock not supported/allowed:', error);
+            });
+        } else if (!this.isFullscreen && screen.orientation && screen.orientation.unlock) {
+            // Unlock orientation when exiting fullscreen
+            screen.orientation.unlock();
+        }
     }
     
     async togglePiP() {
@@ -1149,6 +1195,49 @@ class StreamFlowPlayer {
         this.errorOverlay.classList.remove('active');
     }
     
+    updateAudioTracks() {
+        if (!this.audioContainer || !this.audioMenu) return;
+
+        const tracks = this.video.audioTracks;
+        if (!tracks || tracks.length <= 1) {
+            // Hide button if 0 or 1 track (no switching possible)
+            this.audioContainer.style.display = 'none';
+            return;
+        }
+
+        // Show button if multiple tracks exist
+        this.audioContainer.style.display = 'block';
+
+        // Populate menu
+        this.audioMenu.innerHTML = '';
+
+        for (let i = 0; i < tracks.length; i++) {
+            const track = tracks[i];
+            const btn = document.createElement('button');
+            btn.className = 'audio-track-option' + (track.enabled ? ' active' : '');
+
+            // Build a descriptive label
+            let label = track.label || track.language || `Track ${i + 1}`;
+            if (track.kind && track.kind !== 'main') {
+                label += ` (${track.kind})`;
+            }
+            btn.textContent = label;
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Disable all tracks, then enable the selected one
+                for (let j = 0; j < tracks.length; j++) {
+                    tracks[j].enabled = false;
+                }
+                track.enabled = true;
+                this.updateAudioTracks(); // Re-render menu to update active state
+                this.audioMenu.classList.remove('active');
+            });
+
+            this.audioMenu.appendChild(btn);
+        }
+    }
+
     handleError(e) {
         const error = this.video.error;
         let message = 'Unable to load video';

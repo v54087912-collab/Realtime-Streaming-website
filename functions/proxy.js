@@ -38,6 +38,7 @@ export async function onRequest(context) {
         const response = await fetch(videoUrl, {
             method: request.method,
             headers: headers,
+            redirect: 'follow'
         });
 
         const proxyHeaders = new Headers(response.headers);

@@ -106,7 +106,7 @@
                             <input type="checkbox" id="useProxy">
                             <span class="proxy-slider"></span>
                         </label>
-                        <span class="proxy-label">Use Proxy (Bypass Restrictions)</span>
+                        <span class="proxy-label">Use Proxy (Bypass Restrictions) - Note: Direct video links required (e.g. .mp4)</span>
                     </div>
                     
                     <div class="supported-formats">
@@ -239,6 +239,22 @@
                             </div>
 
                             <div class="controls-right">
+                                <!-- Audio Track / Language Selection -->
+                                <div class="audio-container" id="audioContainer" style="display: none; position: relative;">
+                                    <button class="ctrl-btn audio-btn" id="audioBtn" title="Audio Language">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <!-- Simple headset/audio icon -->
+                                            <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                                            <path d="M21 19a2 2 0 0 1-2 2h-1v-6h3v4z"/>
+                                            <path d="M3 19a2 2 0 0 0 2 2h1v-6H3v4z"/>
+                                        </svg>
+                                    </button>
+                                    <div class="audio-menu" id="audioMenu">
+                                        <!-- Audio tracks will be populated here -->
+                                    </div>
+                                </div>
+
                                 <!-- Playback Speed -->
                                 <div class="speed-container">
                                     <button class="ctrl-btn speed-btn" id="speedBtn" title="Playback Speed">
