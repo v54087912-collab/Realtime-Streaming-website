@@ -277,6 +277,47 @@
                                     </svg>
                                 </button>
 
+                                <!-- Shortcuts Menu / Settings -->
+                                <div class="shortcuts-menu-container">
+                                    <button class="ctrl-btn" id="shortcutsBtn" title="Shortcuts & Settings">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="shortcuts-menu-panel" id="shortcutsMenuPanel">
+                                        <div class="shortcuts-menu-header">
+                                            <span>Shortcuts</span>
+                                        </div>
+                                        <div class="shortcuts-grid-menu">
+                                            <label class="shortcut-item">
+                                                <input type="checkbox" id="chkLoop">
+                                                <span class="shortcut-label">Loop</span>
+                                            </label>
+                                            <label class="shortcut-item">
+                                                <input type="checkbox" id="chkNightMode">
+                                                <span class="shortcut-label">Night Mode</span>
+                                            </label>
+                                            <label class="shortcut-item">
+                                                <input type="checkbox" id="chkBackgroundPlay">
+                                                <span class="shortcut-label">Background Play</span>
+                                            </label>
+                                            <div class="shortcut-action" id="btnAspectRatio">
+                                                <span>Aspect Ratio</span>
+                                            </div>
+                                            <div class="shortcut-action" id="btnABRepeat">
+                                                <span id="abRepeatLabel">A-B Repeat</span>
+                                            </div>
+                                            <div class="shortcut-action" id="btnSleepTimer">
+                                                <span>Sleep Timer</span>
+                                            </div>
+                                            <div class="shortcut-action" id="btnScreenshot">
+                                                <span>Screenshot</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Fullscreen -->
                                 <button class="ctrl-btn" id="fullscreenBtn" title="Fullscreen (F)">
                                     <svg class="icon-expand" viewBox="0 0 24 24" fill="none">

@@ -125,6 +125,42 @@ class StreamFlowPlayer {
     }
     
     bindEvents() {
+        // Speed FF (Long Press)
+        let speedFfTimeout = null;
+        this.originalSpeed = 1;
+        this.isSpeedFfActive = false;
+
+        const startSpeedFf = () => {
+            if (!this.isPlaying || this.isSpeedFfActive) return;
+            speedFfTimeout = setTimeout(() => {
+                this.isSpeedFfActive = true;
+                this.originalSpeed = this.video.playbackRate;
+                this.setPlaybackSpeed(2.0);
+                this.showSpeedWarning('2x Fast Forward');
+            }, 500); // 500ms long press
+        };
+
+        const endSpeedFf = () => {
+            if (speedFfTimeout) {
+                clearTimeout(speedFfTimeout);
+                speedFfTimeout = null;
+            }
+            if (this.isSpeedFfActive) {
+                this.isSpeedFfActive = false;
+                this.setPlaybackSpeed(this.originalSpeed);
+                // Remove fast forward indicator if any
+                const existingWarning = this.playerContainer.querySelector('.speed-warning');
+                if (existingWarning && existingWarning.textContent.includes('Fast Forward')) {
+                    existingWarning.remove();
+                }
+            }
+        };
+
+        this.playerContainer.addEventListener('pointerdown', startSpeedFf);
+        this.playerContainer.addEventListener('pointerup', endSpeedFf);
+        this.playerContainer.addEventListener('pointerleave', endSpeedFf);
+        this.playerContainer.addEventListener('pointercancel', endSpeedFf);
+
         // Sidebar
         if (this.logoBtn && this.sidebar && this.sidebarOverlay && this.closeSidebarBtn) {
             this.logoBtn.addEventListener('click', () => this.openSidebar());
@@ -234,6 +270,133 @@ class StreamFlowPlayer {
             this.speedMenu.classList.remove('active');
         });
         
+        // Settings / Shortcuts panel logic
+        const shortcutsBtn = document.getElementById('shortcutsBtn');
+        const shortcutsMenuPanel = document.getElementById('shortcutsMenuPanel');
+        if (shortcutsBtn && shortcutsMenuPanel) {
+            shortcutsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                shortcutsMenuPanel.classList.toggle('active');
+            });
+            shortcutsMenuPanel.addEventListener('click', (e) => {
+                e.stopPropagation(); // keep menu open when clicking inside
+            });
+            document.addEventListener('click', () => {
+                shortcutsMenuPanel.classList.remove('active');
+            });
+
+            // Loop feature
+            const chkLoop = document.getElementById('chkLoop');
+            if (chkLoop) chkLoop.addEventListener('change', (e) => {
+                this.video.loop = e.target.checked;
+            });
+
+            // Night Mode feature
+            const chkNightMode = document.getElementById('chkNightMode');
+            if (chkNightMode) chkNightMode.addEventListener('change', (e) => {
+                this.video.classList.toggle('night-mode', e.target.checked);
+            });
+
+            // Background Play (prevents pause on page hide)
+            const chkBackgroundPlay = document.getElementById('chkBackgroundPlay');
+            this.backgroundPlayEnabled = false;
+            if (chkBackgroundPlay) chkBackgroundPlay.addEventListener('change', (e) => {
+                this.backgroundPlayEnabled = e.target.checked;
+            });
+
+            // Aspect Ratio
+            const btnAspectRatio = document.getElementById('btnAspectRatio');
+            this.currentAspectRatio = 'aspect-contain';
+            if (btnAspectRatio) btnAspectRatio.addEventListener('click', () => {
+                const ratios = ['aspect-contain', 'aspect-cover', 'aspect-fill'];
+                const currentIndex = ratios.indexOf(this.currentAspectRatio);
+                const nextIndex = (currentIndex + 1) % ratios.length;
+                this.video.classList.remove(this.currentAspectRatio);
+                this.currentAspectRatio = ratios[nextIndex];
+                this.video.classList.add(this.currentAspectRatio);
+            });
+
+            // A-B Repeat
+            const btnABRepeat = document.getElementById('btnABRepeat');
+            const abRepeatLabel = document.getElementById('abRepeatLabel');
+            this.timeA = null;
+            this.timeB = null;
+            if (btnABRepeat) btnABRepeat.addEventListener('click', () => {
+                if (this.timeA === null) {
+                    this.timeA = this.video.currentTime;
+                    abRepeatLabel.textContent = `A: ${this.formatTime(this.timeA)} - B: Set`;
+                    btnABRepeat.classList.add('active-state');
+                } else if (this.timeB === null) {
+                    this.timeB = Math.max(this.timeA + 1, this.video.currentTime); // Ensure B > A
+                    abRepeatLabel.textContent = `Looping A-B`;
+                } else {
+                    this.timeA = null;
+                    this.timeB = null;
+                    abRepeatLabel.textContent = 'A-B Repeat';
+                    btnABRepeat.classList.remove('active-state');
+                }
+            });
+
+            // Sleep Timer
+            const btnSleepTimer = document.getElementById('btnSleepTimer');
+            this.sleepTimerId = null;
+            if (btnSleepTimer) btnSleepTimer.addEventListener('click', () => {
+                if (this.sleepTimerId) {
+                    clearTimeout(this.sleepTimerId);
+                    this.sleepTimerId = null;
+                    btnSleepTimer.querySelector('span').textContent = 'Sleep Timer';
+                    btnSleepTimer.classList.remove('active-state');
+                } else {
+                    const mins = prompt("Enter sleep timer in minutes:");
+                    if (mins && !isNaN(mins) && parseInt(mins) > 0) {
+                        this.sleepTimerId = setTimeout(() => {
+                            this.video.pause();
+                            this.sleepTimerId = null;
+                            btnSleepTimer.querySelector('span').textContent = 'Sleep Timer';
+                            btnSleepTimer.classList.remove('active-state');
+                        }, parseInt(mins) * 60000);
+                        btnSleepTimer.querySelector('span').textContent = `Timer: ${mins}m`;
+                        btnSleepTimer.classList.add('active-state');
+                    }
+                }
+            });
+
+            // Screenshot
+            const btnScreenshot = document.getElementById('btnScreenshot');
+            if (btnScreenshot) btnScreenshot.addEventListener('click', () => {
+                if (!this.video.videoWidth) return;
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.video.videoWidth;
+                    canvas.height = this.video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+
+                    const a = document.createElement('a');
+                    a.href = canvas.toDataURL('image/png');
+                    a.download = `screenshot_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } catch (e) {
+                    console.error('Screenshot failed, possibly due to CORS:', e);
+                    alert("Cannot take screenshot due to CORS restrictions on this video.");
+                }
+            });
+        }
+
+        // Handle background play
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && !this.backgroundPlayEnabled && this.isPlaying) {
+                this.video.pause();
+                this.wasPlayingBeforeBackground = true;
+            } else if (!document.hidden && this.wasPlayingBeforeBackground) {
+                // optional: resume playing if user returned
+                // this.video.play();
+                this.wasPlayingBeforeBackground = false;
+            }
+        });
+
         // Shortcuts Modal
         this.closeShortcuts.addEventListener('click', () => {
             this.shortcutsModal.classList.remove('active');
@@ -323,6 +486,13 @@ class StreamFlowPlayer {
             // Track max watched position for history buffer
             if (this.video.currentTime > this.maxWatchedPosition) {
                 this.maxWatchedPosition = this.video.currentTime;
+            }
+
+            // A-B Repeat logic
+            if (this.timeB !== null && this.timeA !== null) {
+                if (this.video.currentTime >= this.timeB) {
+                    this.video.currentTime = this.timeA;
+                }
             }
         });
         
@@ -997,17 +1167,30 @@ class StreamFlowPlayer {
         }
     }
     
-    showSpeedWarning(speed) {
+    showSpeedWarning(speedOrMessage) {
+        // Remove existing warning if any
+        const existingWarning = this.playerContainer.querySelector('.speed-warning');
+        if (existingWarning) existingWarning.remove();
+
         // Show temporary warning
         const warning = document.createElement('div');
         warning.className = 'speed-warning';
-        warning.innerHTML = `⚠️ ${speed}x not supported. Browser limit: 0.0625x - 16x`;
+
+        if (typeof speedOrMessage === 'number') {
+            warning.innerHTML = `⚠️ ${speedOrMessage}x not supported. Browser limit: 0.0625x - 16x`;
+        } else {
+            warning.innerHTML = `⏩ ${speedOrMessage}`;
+        }
         
         this.playerContainer.appendChild(warning);
         
         setTimeout(() => {
-            warning.classList.add('fade-out');
-            setTimeout(() => warning.remove(), 300);
+            if (warning.parentNode) {
+                warning.classList.add('fade-out');
+                setTimeout(() => {
+                    if (warning.parentNode) warning.remove();
+                }, 300);
+            }
         }, 2500);
     }
     
@@ -1030,6 +1213,17 @@ class StreamFlowPlayer {
     onFullscreenChange() {
         this.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
         this.playerContainer.classList.toggle('fullscreen', this.isFullscreen);
+
+        // Auto landscape lock for mobile when entering fullscreen
+        try {
+            if (this.isFullscreen && screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(e => console.log('Orientation lock failed:', e));
+            } else if (!this.isFullscreen && screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
+        } catch (e) {
+            console.log('Orientation API not supported or error:', e);
+        }
     }
     
     async togglePiP() {
