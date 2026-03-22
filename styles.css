@@ -1565,3 +1565,126 @@ body {
 .logo#logoBtn:hover {
     opacity: 0.8;
 }
+
+/* Shortcuts / Settings Menu Panel */
+.shortcuts-menu-container {
+    position: relative;
+    display: flex;
+}
+
+.shortcuts-menu-panel {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    right: 0;
+    width: max-content;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all var(--transition-normal);
+    z-index: 100;
+}
+
+.shortcuts-menu-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.shortcuts-menu-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.shortcuts-grid-menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.shortcut-item:hover {
+    color: var(--text-primary);
+}
+
+.shortcut-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+}
+
+.shortcut-item input[type="checkbox"]:checked {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.shortcut-item input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--bg-deep);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.shortcut-action {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.shortcut-action:hover {
+    color: var(--text-primary);
+}
+
+.shortcut-action.active-state {
+    color: var(--accent-primary);
+    font-weight: 500;
+}
+
+/* Video Effect Classes */
+video.night-mode {
+    filter: sepia(0.2) brightness(0.8) !important;
+}
+
+video.aspect-contain {
+    object-fit: contain !important;
+}
+
+video.aspect-cover {
+    object-fit: cover !important;
+}
+
+video.aspect-fill {
+    object-fit: fill !important;
+}
