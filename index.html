@@ -76,9 +76,134 @@
 
         <!-- Main Content -->
         <main class="main-content">
+
+            <!-- Home Section -->
+            <section class="home-section active" id="homeSection">
+                <!-- Hero Banner -->
+                <div class="hero-banner">
+                    <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Featured Movie" class="hero-bg">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-content">
+                        <h1 class="hero-title">The Dark Knight</h1>
+                        <p class="hero-description">When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.</p>
+                        <div class="hero-buttons">
+                            <!-- Example dummy video URL -->
+                            <button class="btn-primary" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                                Play
+                            </button>
+                            <button class="btn-secondary" id="openUrlStreamBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                                </svg>
+                                Stream URL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Rows -->
+                <div class="content-rows">
+                    <!-- Trending Now -->
+                    <div class="row-container">
+                        <h2 class="row-title">Trending Now</h2>
+                        <div class="movie-row">
+                            <div class="movie-card" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+                                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60" alt="Movie 1">
+                                <div class="movie-info">
+                                    <h3>Inception</h3>
+                                    <span>2010 • Sci-Fi</span>
+                                </div>
+                            </div>
+                            <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4">
+                                <img src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=500&auto=format&fit=crop&q=60" alt="Movie 2">
+                                <div class="movie-info">
+                                    <h3>Interstellar</h3>
+                                    <span>2014 • Adventure</span>
+                                </div>
+                            </div>
+                            <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
+                                <img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500&auto=format&fit=crop&q=60" alt="Movie 3">
+                                <div class="movie-info">
+                                    <h3>The Matrix</h3>
+                                    <span>1999 • Action</span>
+                                </div>
+                            </div>
+                            <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4">
+                                <img src="https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=500&auto=format&fit=crop&q=60" alt="Movie 4">
+                                <div class="movie-info">
+                                    <h3>Blade Runner 2049</h3>
+                                    <span>2017 • Sci-Fi</span>
+                                </div>
+                            </div>
+                             <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4">
+                                <img src="https://images.unsplash.com/photo-1616530940355-351fabd9524b?w=500&auto=format&fit=crop&q=60" alt="Movie 5">
+                                <div class="movie-info">
+                                    <h3>Arrival</h3>
+                                    <span>2016 • Drama</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popular Web Series -->
+                    <div class="row-container">
+                        <h2 class="row-title">Popular Web Series</h2>
+                        <div class="movie-row">
+                            <div class="movie-card" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+                                <img src="https://images.unsplash.com/photo-1509281373149-e957c6296406?w=500&auto=format&fit=crop&q=60" alt="Series 1">
+                                <div class="movie-info">
+                                    <h3>Breaking Bad</h3>
+                                    <span>Crime • Drama</span>
+                                </div>
+                            </div>
+                            <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4">
+                                <img src="https://images.unsplash.com/photo-1585647347384-2593bc35786b?w=500&auto=format&fit=crop&q=60" alt="Series 2">
+                                <div class="movie-info">
+                                    <h3>Stranger Things</h3>
+                                    <span>Sci-Fi • Horror</span>
+                                </div>
+                            </div>
+                            <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4">
+                                <img src="https://images.unsplash.com/photo-1550399105-c4db5fb85c18?w=500&auto=format&fit=crop&q=60" alt="Series 3">
+                                <div class="movie-info">
+                                    <h3>The Crown</h3>
+                                    <span>Biography • Drama</span>
+                                </div>
+                            </div>
+                            <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4">
+                                <img src="https://images.unsplash.com/photo-1533518463841-d62e1fc91373?w=500&auto=format&fit=crop&q=60" alt="Series 4">
+                                <div class="movie-info">
+                                    <h3>Chernobyl</h3>
+                                    <span>History • Thriller</span>
+                                </div>
+                            </div>
+                             <div class="movie-card" data-url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4">
+                                <img src="https://images.unsplash.com/photo-1560109947-543149eceb16?w=500&auto=format&fit=crop&q=60" alt="Series 5">
+                                <div class="movie-info">
+                                    <h3>Dark</h3>
+                                    <span>Crime • Sci-Fi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- URL Input Section -->
-            <section class="url-section" id="urlSection">
+            <section class="url-section hidden" id="urlSection">
                 <div class="url-container">
+
+                    <button class="back-to-home-btn" id="backToHomeFromUrlBtn">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Back to Home</span>
+                    </button>
+
                     <h1 class="title">Stream Any Video</h1>
                     <p class="subtitle">Paste a direct video URL for instant, buffer-free playback</p>
                     

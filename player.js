@@ -11,6 +11,7 @@ class StreamFlowPlayer {
         this.sidebar = document.getElementById('sidebar');
         this.closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
+        this.homeSection = document.getElementById('homeSection');
         this.urlSection = document.getElementById('urlSection');
         this.playerSection = document.getElementById('playerSection');
         this.playerContainer = document.getElementById('playerContainer');
@@ -169,11 +170,40 @@ class StreamFlowPlayer {
         }
 
         // URL Input
+
+        // Navigation Events
+        const openUrlStreamBtn = document.getElementById('openUrlStreamBtn');
+        if (openUrlStreamBtn) {
+            openUrlStreamBtn.addEventListener('click', () => {
+                this.showUrlSection();
+            });
+        }
+
+        const backToHomeFromUrlBtn = document.getElementById('backToHomeFromUrlBtn');
+        if (backToHomeFromUrlBtn) {
+            backToHomeFromUrlBtn.addEventListener('click', () => {
+                this.showHomeSection();
+            });
+        }
+
+        // Movie Card Clicks
+        const movieCards = document.querySelectorAll('.movie-card, .btn-primary');
+        movieCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const url = card.getAttribute('data-url');
+                if (url) {
+                    this.urlInput.value = url;
+                    this.loadVideo();
+                }
+            });
+        });
+
         this.loadBtn.addEventListener('click', () => this.loadVideo());
+
         this.urlInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.loadVideo();
         });
-        this.backBtn.addEventListener('click', () => this.showUrlSection());
+        this.backBtn.addEventListener('click', () => this.showHomeSection());
         this.retryBtn.addEventListener('click', () => this.loadVideo());
         
         // Play Controls
@@ -1391,14 +1421,51 @@ class StreamFlowPlayer {
         this.showError(message);
     }
     
+
     showPlayerSection() {
-        this.urlSection.classList.add('hidden');
-        this.playerSection.classList.add('active');
+        if(this.homeSection) this.homeSection.classList.remove('active');
+        if(this.urlSection) this.urlSection.classList.add('hidden');
+        if(this.playerSection) this.playerSection.classList.add('active');
+
     }
     
+
+    showHomeSection() {
+        if(this.homeSection) this.homeSection.classList.add('active');
+        if(this.urlSection) this.urlSection.classList.add('hidden');
+        if(this.playerSection) this.playerSection.classList.remove('active');
+
+        // Stop buffer management
+        this.stopBufferManagement();
+
+        // Reset video
+        this.video.pause();
+        this.video.src = '';
+        this.video.load();
+
+        // Reset UI
+        this.isPlaying = false;
+        this.updatePlayPauseUI();
+        this.currentTimeDisplay.textContent = '00:00';
+        this.durationDisplay.textContent = '00:00';
+        this.progressBar.style.width = '0%';
+        this.bufferBar.style.width = '0%';
+        this.hideControlsTimeout = null;
+
+        // Ensure standard orientation and styles when exiting player
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock().catch(() => {});
+        }
+
+        // Remove fullscreen class if present
+        this.playerContainer.classList.remove('fullscreen');
+    }
+
     showUrlSection() {
-        this.urlSection.classList.remove('hidden');
-        this.playerSection.classList.remove('active');
+        if(this.homeSection) this.homeSection.classList.remove('active');
+        if(this.urlSection) this.urlSection.classList.remove('hidden');
+        if(this.playerSection) this.playerSection.classList.remove('active');
+
         
         // Stop buffer management
         this.stopBufferManagement();
