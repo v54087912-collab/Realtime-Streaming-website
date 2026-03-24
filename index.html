@@ -239,6 +239,35 @@
                             </div>
 
                             <div class="controls-right">
+                                <!-- Audio Tracks -->
+                                <div class="audio-container">
+                                    <button class="ctrl-btn" id="audioBtn" title="Audio Tracks" style="display: none;">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 3v18M8 8v8M16 6v12M4 11v2M20 10v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </button>
+                                    <div class="audio-menu" id="audioMenu">
+                                        <div class="audio-list" id="audioList">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Download -->
+                                <div class="download-container">
+                                    <button class="ctrl-btn" id="downloadBtn" title="Download">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                    <div class="download-menu" id="downloadMenu">
+                                        <div class="download-options" id="downloadOptions">
+                                            <button class="download-option" data-quality="1080p">1080p</button>
+                                            <button class="download-option" data-quality="720p">720p</button>
+                                            <button class="download-option" data-quality="480p">480p</button>
+                                            <button class="download-option" data-quality="original">Original</button>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Playback Speed -->
                                 <div class="speed-container">
                                     <button class="ctrl-btn speed-btn" id="speedBtn" title="Playback Speed">

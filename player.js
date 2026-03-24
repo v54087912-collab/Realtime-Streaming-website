@@ -27,6 +27,15 @@ class StreamFlowPlayer {
         this.errorText = document.getElementById('errorText');
         this.bufferIndicator = document.getElementById('bufferIndicator');
         
+        // Audio Tracks
+        this.audioBtn = document.getElementById('audioBtn');
+        this.audioMenu = document.getElementById('audioMenu');
+        this.audioList = document.getElementById('audioList');
+
+        // Download
+        this.downloadBtn = document.getElementById('downloadBtn');
+        this.downloadMenu = document.getElementById('downloadMenu');
+
         // Controls
         this.controls = document.getElementById('controls');
         this.playPauseBtn = document.getElementById('playPauseBtn');
@@ -211,6 +220,32 @@ class StreamFlowPlayer {
         this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
         this.pipBtn.addEventListener('click', () => this.togglePiP());
         
+        // Audio Menu
+        if (this.audioBtn && this.audioMenu) {
+            this.audioBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.audioMenu.classList.toggle('active');
+            });
+        }
+
+        // Download Menu
+        if (this.downloadBtn && this.downloadMenu) {
+            this.downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.downloadMenu.classList.toggle('active');
+            });
+
+            const downloadOptions = this.downloadMenu.querySelectorAll('.download-option');
+            downloadOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const quality = e.target.dataset.quality;
+                    this.downloadVideo(quality);
+                    this.downloadMenu.classList.remove('active');
+                });
+            });
+        }
+
         // Time Input - click time display to show input
         this.timeDisplay.addEventListener('click', () => this.showTimeInput());
         this.timeGoBtn.addEventListener('click', () => this.jumpToInputTime());
@@ -268,6 +303,12 @@ class StreamFlowPlayer {
         // Close speed menu when clicking outside
         document.addEventListener('click', () => {
             this.speedMenu.classList.remove('active');
+            if (this.audioMenu) {
+                this.audioMenu.classList.remove('active');
+            }
+            if (this.downloadMenu) {
+                this.downloadMenu.classList.remove('active');
+            }
         });
         
         // Settings / Shortcuts panel logic
@@ -442,6 +483,8 @@ class StreamFlowPlayer {
             this.startBufferManagement();
             // Initialize speed status
             this.updateSpeedStatus();
+            // Initialize Audio Tracks
+            this.initAudioTracks();
             
             console.log(`Video loaded: ${this.formatTime(this.video.duration)} duration`);
         });
@@ -511,6 +554,66 @@ class StreamFlowPlayer {
         this.video.addEventListener('volumechange', () => this.updateVolumeUI());
     }
     
+    initAudioTracks() {
+        if (!this.audioBtn || !this.audioList) return;
+
+        // Clear existing tracks
+        this.audioList.innerHTML = '';
+
+        // Check if audioTracks API is supported and has tracks
+        if (this.video.audioTracks && this.video.audioTracks.length > 1) {
+            this.audioBtn.style.display = 'flex';
+
+            for (let i = 0; i < this.video.audioTracks.length; i++) {
+                const track = this.video.audioTracks[i];
+                const option = document.createElement('button');
+                option.className = 'audio-option';
+                if (track.enabled) {
+                    option.classList.add('active');
+                }
+
+                // Add checkmark for active track
+                const checkmark = track.enabled ? '✓ ' : '&nbsp;&nbsp;';
+                const label = track.label || track.language || `Track ${i + 1}`;
+                option.innerHTML = `<span>${checkmark}</span>${label}`;
+
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.setAudioTrack(i);
+                });
+
+                this.audioList.appendChild(option);
+            }
+        } else {
+            this.audioBtn.style.display = 'none';
+            this.audioMenu.classList.remove('active');
+        }
+    }
+
+    setAudioTrack(index) {
+        if (!this.video.audioTracks || index >= this.video.audioTracks.length) return;
+
+        for (let i = 0; i < this.video.audioTracks.length; i++) {
+            this.video.audioTracks[i].enabled = (i === index);
+        }
+
+        // Update UI
+        this.initAudioTracks();
+
+        this.audioMenu.classList.remove('active');
+    }
+
+    downloadVideo(quality) {
+        if (!this.currentUrl) return;
+
+        const a = document.createElement('a');
+        a.href = this.currentUrl;
+        a.download = `video_${quality}_${Date.now()}.mp4`; // Try to suggest a filename
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
     loadVideo() {
         let url = this.urlInput.value.trim();
         if (!url) {
@@ -769,6 +872,11 @@ class StreamFlowPlayer {
         }
         
         this.video.currentTime = Math.max(0, Math.min(targetTime, this.video.duration));
+
+        // Always start playing from that timestamp when seeking as requested
+        if (this.video.paused) {
+            this.video.play().catch(e => console.error('Play error after seek:', e));
+        }
     }
     
     isTimeBuffered(time) {
