@@ -1,21 +1,17 @@
-const express = require('express');
-const app = express();
+const fs = require('fs');
 
-app.use(express.json());
+let server = fs.readFileSync('server.js', 'utf8');
 
-// In-memory token storage for Share Link feature
-const tokenMap = {};
+const searchStr = `app.get('/api/share/:token', (req, res) => {
+    const url = tokenMap[req.params.token];
+    if (url) {
+        res.json({ url });
+    } else {
+        res.status(404).json({ error: 'Token not found' });
+    }
+});`;
 
-app.post('/api/share', (req, res) => {
-    const { url } = req.body;
-    if (!url) return res.status(400).json({ error: 'URL required' });
-
-    const token = Math.random().toString(36).substring(2, 8);
-    tokenMap[token] = url;
-    res.json({ token });
-});
-
-app.get('/api/share/:token', (req, res) => {
+const replaceStr = `app.get('/api/share/:token', (req, res) => {
     const url = tokenMap[req.params.token];
     if (url) {
         res.json({ url });
@@ -64,7 +60,8 @@ app.get('/stream/:token', (req, res) => {
     });
 
     req.pipe(proxyReq);
-});
+});`;
 
-app.use(express.static('.'));
-app.listen(4000, () => console.log('Server running on port 4000'));
+server = server.replace(searchStr, replaceStr);
+
+fs.writeFileSync('server.js', server);

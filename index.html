@@ -239,6 +239,54 @@
                             </div>
 
                             <div class="controls-right">
+                                <!-- Share Button -->
+                                <button class="ctrl-btn" id="shareBtn" title="Share">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                    </svg>
+                                </button>
+
+                                <!-- Download Button -->
+                                <div class="download-container" id="downloadContainer">
+                                    <button class="ctrl-btn" id="downloadBtn" title="Download">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                    </button>
+                                    <div class="download-menu" id="downloadMenu">
+                                        <div class="download-header">Select Quality</div>
+                                        <div class="download-options-list" id="downloadOptionsList">
+                                            <button class="download-option" data-quality="1080p">1080p (FHD)</button>
+                                            <button class="download-option" data-quality="720p">720p (HD)</button>
+                                            <button class="download-option" data-quality="480p">480p (SD)</button>
+                                            <button class="download-option" data-quality="original">Original Size</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Audio Track Switcher -->
+                                <div class="audio-container" id="audioContainer">
+                                    <button class="ctrl-btn" id="audioBtn" title="Audio Tracks">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M9 18V5l12-2v13"></path>
+                                            <circle cx="6" cy="18" r="3"></circle>
+                                            <circle cx="18" cy="16" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                    <div class="audio-menu" id="audioMenu">
+                                        <div class="audio-header">Audio Tracks</div>
+                                        <div class="audio-tracks-list" id="audioTracksList">
+                                            <!-- Tracks will be injected here -->
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Playback Speed -->
                                 <div class="speed-container">
                                     <button class="ctrl-btn speed-btn" id="speedBtn" title="Playback Speed">
@@ -340,6 +388,26 @@
                         <span class="error-text" id="errorText">Unable to load video</span>
                         <button class="retry-btn" id="retryBtn">Try Again</button>
                     </div>
+                </div>
+
+                <!-- Resume Prompt -->
+                <div class="resume-toast" id="resumeToast">
+                    <div class="resume-toast-header">Resume Playback?</div>
+                    <div class="resume-toast-msg" id="resumeMsg">Resume from 00:00?</div>
+                    <div class="resume-toast-actions">
+                        <button id="resumeBtn">Resume</button>
+                        <button id="startOverBtn">Start Over</button>
+                    </div>
+                </div>
+
+                <!-- Share Toast -->
+                <div class="share-toast" id="shareToast">
+                    <div class="share-toast-header">Share Link</div>
+                    <div class="share-toast-body">
+                        <input type="text" id="shareLinkInput" readonly>
+                        <button id="copyShareBtn">Copy</button>
+                    </div>
+                    <div class="share-toast-success" id="shareSuccessMsg">Link Copied!</div>
                 </div>
 
                 <!-- Back Button -->

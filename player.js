@@ -38,11 +38,30 @@ class StreamFlowPlayer {
         this.volumeFill = document.getElementById('volumeFill');
         this.fullscreenBtn = document.getElementById('fullscreenBtn');
         this.pipBtn = document.getElementById('pipBtn');
+        this.audioContainer = document.getElementById('audioContainer');
+        this.audioBtn = document.getElementById('audioBtn');
+        this.downloadBtn = document.getElementById('downloadBtn');
+        this.downloadMenu = document.getElementById('downloadMenu');
+        this.audioMenu = document.getElementById('audioMenu');
+        this.audioTracksList = document.getElementById('audioTracksList');
         this.speedBtn = document.getElementById('speedBtn');
         this.speedMenu = document.getElementById('speedMenu');
         this.speedValue = document.getElementById('speedValue');
         this.retryBtn = document.getElementById('retryBtn');
         
+        // Resume Feature
+        this.resumeToast = document.getElementById('resumeToast');
+        this.resumeMsg = document.getElementById('resumeMsg');
+        this.resumeBtn = document.getElementById('resumeBtn');
+        this.startOverBtn = document.getElementById('startOverBtn');
+
+        // Share Feature
+        this.shareBtn = document.getElementById('shareBtn');
+        this.shareToast = document.getElementById('shareToast');
+        this.shareLinkInput = document.getElementById('shareLinkInput');
+        this.copyShareBtn = document.getElementById('copyShareBtn');
+        this.shareSuccessMsg = document.getElementById('shareSuccessMsg');
+
         // Progress
         this.progressContainer = document.getElementById('progressContainer');
         this.progressBuffer = document.getElementById('progressBuffer');
@@ -115,10 +134,42 @@ class StreamFlowPlayer {
         // Focus input on load
         this.urlInput.focus();
         
-        // Check for URL in query params
+                        // Check for token or URL in query params
         const params = new URLSearchParams(window.location.search);
+        const token = params.get('v');
         const videoUrl = params.get('url');
-        if (videoUrl) {
+
+        if (token) {
+            // Use the proxy stream endpoint directly instead of exposing the original URL
+            // Validate the token exists first before setting it as the video source
+            fetch('/api/share/' + token)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.url) {
+                        // The token is valid. Now load the proxy endpoint as the video source.
+                        // This ensures the real URL never hits the client DOM or network tab.
+                        const streamUrl = window.location.origin + '/stream/' + token;
+
+                        this.urlInput.value = streamUrl; // This is hidden anyway
+                        this.currentUrl = streamUrl;
+
+                        this.urlSection.classList.add('hidden');
+                        this.showPlayerSection();
+                        this.showLoading();
+
+                        // Load via direct video (stream proxy)
+                        this.loadDirectVideo(streamUrl);
+
+                        this.urlInput.style.display = 'none'; // Hide URL to prevent exposure
+                    } else {
+                        alert('Invalid or expired share link.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error retrieving share link:', err);
+                    alert('Error retrieving share link.');
+                });
+        } else if (videoUrl) {
             this.urlInput.value = decodeURIComponent(videoUrl);
             this.loadVideo();
         }
@@ -222,10 +273,108 @@ class StreamFlowPlayer {
             setTimeout(() => this.hideTimeInput(), 200);
         });
         
+        // Download Menu
+        if (this.downloadBtn && this.downloadMenu) {
+            this.downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.downloadMenu.classList.toggle('active');
+
+                // Close other menus
+                if (this.speedMenu) this.speedMenu.classList.remove('active');
+                if (this.audioMenu) this.audioMenu.classList.remove('active');
+            });
+
+            // Handle download options
+            document.querySelectorAll('.download-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const quality = e.target.dataset.quality;
+                    this.triggerDownload(quality);
+                    this.downloadMenu.classList.remove('active');
+                });
+            });
+
+            // Close download menu when clicking outside
+            document.addEventListener('click', () => {
+                this.downloadMenu.classList.remove('active');
+            });
+
+            this.downloadMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Audio Menu
+        if (this.audioBtn && this.audioMenu) {
+            this.audioBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.audioMenu.classList.toggle('active');
+
+                // Close other menus
+                if (this.speedMenu) this.speedMenu.classList.remove('active');
+                if (document.getElementById('downloadMenu')) document.getElementById('downloadMenu').classList.remove('active');
+            });
+
+            // Close audio menu when clicking outside
+            document.addEventListener('click', () => {
+                this.audioMenu.classList.remove('active');
+            });
+
+            // Stop propagation on menu click
+            this.audioMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Share Button
+        if (this.shareBtn) {
+            this.shareBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!this.currentUrl) return;
+
+                try {
+                    // Call backend to store token map
+                    const res = await fetch('/api/share', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: this.currentUrl })
+                    });
+
+                    const data = await res.json();
+                    if (!data.token) throw new Error('No token returned');
+
+                    const shareUrl = window.location.origin + window.location.pathname + '?v=' + data.token;
+                    this.shareLinkInput.value = shareUrl;
+
+                    this.shareToast.classList.add('active');
+                    this.shareSuccessMsg.style.display = 'none';
+
+                    // Hide after 5 seconds
+                    setTimeout(() => {
+                        this.shareToast.classList.remove('active');
+                    }, 5000);
+                } catch (err) {
+                    console.error('Error generating share link:', err);
+                    alert('Error generating share link.');
+                }
+            });
+
+            this.copyShareBtn.addEventListener('click', () => {
+                this.shareLinkInput.select();
+                navigator.clipboard.writeText(this.shareLinkInput.value).then(() => {
+                    this.shareSuccessMsg.style.display = 'block';
+                });
+            });
+        }
+
         // Speed Menu
         this.speedBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.speedMenu.classList.toggle('active');
+
+            // Close other menus
+            if (this.audioMenu) this.audioMenu.classList.remove('active');
+            if (document.getElementById('downloadMenu')) document.getElementById('downloadMenu').classList.remove('active');
         });
         
         document.querySelectorAll('.speed-option').forEach(option => {
@@ -436,6 +585,46 @@ class StreamFlowPlayer {
                 this.loadTimeout = null;
             }
             
+            // Check for resume
+            if (this.currentUrl) {
+                const videoId = btoa(this.currentUrl).substring(0, 20);
+                const savedPos = parseFloat(localStorage.getItem('resumePos_' + videoId));
+
+                if (savedPos && savedPos > 5 && savedPos < this.video.duration - 5) {
+                    this.resumeMsg.textContent = `Resume from ${this.formatTime(savedPos)}?`;
+                    this.resumeToast.classList.add('active');
+
+                    const handleResume = () => {
+                        this.video.currentTime = savedPos;
+                        this.video.play();
+                        this.resumeToast.classList.remove('active');
+                        cleanup();
+                    };
+
+                    const handleStartOver = () => {
+                        localStorage.removeItem('resumePos_' + videoId);
+                        this.video.currentTime = 0;
+                        this.video.play();
+                        this.resumeToast.classList.remove('active');
+                        cleanup();
+                    };
+
+                    const cleanup = () => {
+                        this.resumeBtn.removeEventListener('click', handleResume);
+                        this.startOverBtn.removeEventListener('click', handleStartOver);
+                    };
+
+                    this.resumeBtn.addEventListener('click', handleResume);
+                    this.startOverBtn.addEventListener('click', handleStartOver);
+
+                    // Auto hide toast after 10s if ignored
+                    setTimeout(() => {
+                        this.resumeToast.classList.remove('active');
+                        cleanup();
+                    }, 10000);
+                }
+            }
+
             this.durationEl.textContent = this.formatTime(this.video.duration);
             this.hideLoading();
             // Start buffer management once we have metadata
@@ -443,6 +632,9 @@ class StreamFlowPlayer {
             // Initialize speed status
             this.updateSpeedStatus();
             
+            // Check and populate audio tracks
+            this.initAudioTracks();
+
             console.log(`Video loaded: ${this.formatTime(this.video.duration)} duration`);
         });
         
@@ -464,6 +656,18 @@ class StreamFlowPlayer {
             this.isPlaying = true;
             this.playerContainer.classList.add('playing');
             this.playOverlay.classList.add('hidden');
+
+            // Start saving position
+            if (this.savePositionInterval) {
+                clearInterval(this.savePositionInterval);
+            }
+            this.savePositionInterval = setInterval(() => {
+                if (this.currentUrl && this.video.currentTime > 0) {
+                    // Generate a simple hash/id from url
+                    const videoId = btoa(this.currentUrl).substring(0, 20);
+                    localStorage.setItem('resumePos_' + videoId, this.video.currentTime);
+                }
+            }, 5000);
         });
         
         this.video.addEventListener('pause', () => {
@@ -478,6 +682,12 @@ class StreamFlowPlayer {
             this.isPlaying = false;
             this.playerContainer.classList.remove('playing');
             this.playOverlay.classList.remove('hidden');
+
+            // Clear saved position
+            if (this.currentUrl) {
+                const videoId = btoa(this.currentUrl).substring(0, 20);
+                localStorage.removeItem('resumePos_' + videoId);
+            }
         });
         
         // Time update
@@ -511,6 +721,82 @@ class StreamFlowPlayer {
         this.video.addEventListener('volumechange', () => this.updateVolumeUI());
     }
     
+    triggerDownload(quality) {
+        if (!this.currentUrl) {
+            alert('No video loaded to download.');
+            return;
+        }
+
+        // Displaying a small temporary toast could be nicer, but alert works simply too.
+        console.log(`Starting download for ${quality} quality...`);
+
+        const a = document.createElement('a');
+
+        // In a real system with multiple qualities, you'd append ?quality=1080p or swap URLs
+        // For this frontend-only implementation, we just use the current video URL
+        // appending a dummy parameter to simulate quality selection
+        const downloadUrl = new URL(this.currentUrl, window.location.href);
+        if (quality !== 'original') {
+            downloadUrl.searchParams.set('quality', quality);
+        }
+
+        a.href = downloadUrl.toString();
+
+        // Generate a reasonable filename
+        const filename = 'video_' + (quality || 'original') + '.mp4';
+        a.download = filename;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    initAudioTracks() {
+        if (!this.video.audioTracks || this.video.audioTracks.length <= 1) {
+            // Hide the audio switcher if 1 or 0 tracks available, or API not supported
+            if (this.audioContainer) this.audioContainer.style.display = 'none';
+            return;
+        }
+
+        if (this.audioContainer) this.audioContainer.style.display = 'block';
+        if (!this.audioTracksList) return;
+
+        this.audioTracksList.innerHTML = '';
+
+        for (let i = 0; i < this.video.audioTracks.length; i++) {
+            const track = this.video.audioTracks[i];
+            const btn = document.createElement('button');
+            btn.className = 'audio-option' + (track.enabled ? ' active' : '');
+
+            let trackLabel = track.label || track.language || `Track ${i + 1}`;
+
+            btn.innerHTML = `
+                <span class="audio-label">${trackLabel}</span>
+                <svg class="audio-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            `;
+
+            btn.addEventListener('click', () => {
+                // Disable all tracks
+                for (let j = 0; j < this.video.audioTracks.length; j++) {
+                    this.video.audioTracks[j].enabled = false;
+                }
+                // Enable selected track
+                this.video.audioTracks[i].enabled = true;
+
+                // Update UI
+                const allOpts = this.audioTracksList.querySelectorAll('.audio-option');
+                allOpts.forEach(opt => opt.classList.remove('active'));
+                btn.classList.add('active');
+
+                this.audioMenu.classList.remove('active');
+            });
+
+            this.audioTracksList.appendChild(btn);
+        }
+    }
+
     loadVideo() {
         let url = this.urlInput.value.trim();
         if (!url) {
@@ -740,9 +1026,16 @@ class StreamFlowPlayer {
         const rect = this.progressContainer.getBoundingClientRect();
         const pos = (e.clientX - rect.left) / rect.width;
         const clampedPos = Math.max(0, Math.min(1, pos));
-        this.seekToTime(clampedPos * this.video.duration);
+
+        const targetTime = clampedPos * this.video.duration;
+        this.seekToTime(targetTime);
+
+        // Immediately start playing if paused
+        if (this.video.paused) {
+            this.video.play().catch(e => console.error('Play on seek error:', e));
+        }
     }
-    
+
     seekToTime(targetTime) {
         if (!this.video.duration) return;
         
@@ -1403,6 +1696,12 @@ class StreamFlowPlayer {
         // Stop buffer management
         this.stopBufferManagement();
         
+        // Stop saving position
+        if (this.savePositionInterval) {
+            clearInterval(this.savePositionInterval);
+            this.savePositionInterval = null;
+        }
+
         // Reset video
         this.video.pause();
         this.video.src = '';

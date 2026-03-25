@@ -313,7 +313,7 @@ body {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: var(--gradient-accent);
+    background: #ef4444;
     opacity: 0;
     transition: opacity var(--transition-normal);
 }
@@ -723,7 +723,7 @@ body {
     left: 0;
     top: 0;
     height: 100%;
-    background: var(--gradient-accent);
+    background: #ef4444;
     border-radius: inherit;
 }
 
@@ -1005,9 +1005,112 @@ body {
     to { opacity: 0; }
 }
 
-/* Speed Menu */
-.speed-container {
+/* Audio Menu & Speed Menu Common */
+.audio-container,
+.speed-container,
+.download-container {
     position: relative;
+}
+
+.audio-menu,
+.speed-menu,
+.download-menu {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-md);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all var(--transition-normal);
+    min-width: 180px;
+    max-height: 350px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.audio-container:hover .audio-menu,
+.speed-container:hover .speed-menu,
+.download-container:hover .download-menu,
+.audio-menu.active,
+.speed-menu.active,
+.download-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.audio-header,
+.download-header {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: center;
+}
+
+.audio-tracks-list,
+.download-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.audio-option,
+.download-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+
+.audio-option:hover,
+.download-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.audio-option.active {
+    color: var(--accent-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.audio-check {
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.audio-option.active .audio-check {
+    opacity: 1;
+}
+
+/* Speed Menu Only */
+.speed-btn {
+    width: auto;
+    padding: 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
 }
 
 .speed-btn {
@@ -1038,12 +1141,6 @@ body {
     overflow-y: auto;
 }
 
-.speed-container:hover .speed-menu,
-.speed-menu.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
 
 .speed-presets {
     display: grid;
@@ -1334,7 +1431,7 @@ body {
     display: block;
     width: 100%;
     padding: 14px;
-    background: var(--gradient-accent);
+    background: #ef4444;
     border: none;
     border-radius: var(--radius-md);
     font-family: inherit;
@@ -1687,4 +1784,140 @@ video.aspect-cover {
 
 video.aspect-fill {
     object-fit: fill !important;
+}
+
+/* Share Toast */
+.share-toast {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+}
+
+.share-toast.active {
+    display: flex;
+}
+
+.share-toast-header {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.share-toast-body {
+    display: flex;
+    gap: 8px;
+}
+
+.share-toast-body input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    width: 200px;
+}
+
+.share-toast-body button {
+    background: var(--accent-primary);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.share-toast-success {
+    font-size: 0.8rem;
+    color: var(--success);
+    text-align: right;
+    display: none;
+}
+
+/* Resume Toast */
+.resume-toast {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.resume-toast.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.resume-toast-header {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.resume-toast-msg {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.resume-toast-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.resume-toast-actions button {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+#resumeBtn {
+    background: var(--accent-primary);
+    color: var(--bg-deep);
+    border: none;
+}
+
+#startOverBtn {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#resumeBtn:hover {
+    background: #e4e4e7;
+}
+
+#startOverBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
