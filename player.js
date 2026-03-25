@@ -594,23 +594,34 @@ class StreamFlowPlayer {
     
     initAudioTracks() {
         if (!this.audioBtn || !this.audioList) return;
-
-        // Clear existing tracks
         this.audioList.innerHTML = '';
 
-        // Check if audioTracks API is supported and has tracks
-        if (this.video.audioTracks && this.video.audioTracks.length > 1) {
+        if (this.hls && this.hls.audioTracks && this.hls.audioTracks.length > 1) {
             this.audioBtn.style.display = 'flex';
+            for (let i = 0; i < this.hls.audioTracks.length; i++) {
+                const track = this.hls.audioTracks[i];
+                const option = document.createElement('button');
+                option.className = 'audio-option';
+                if (i === this.hls.audioTrack) option.classList.add('active');
 
+                const checkmark = (i === this.hls.audioTrack) ? '✓ ' : '&nbsp;&nbsp;';
+                const label = track.name || track.language || `Track ${i + 1}`;
+                option.innerHTML = `<span>${checkmark}</span>${label}`;
+
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.setAudioTrack(i);
+                });
+                this.audioList.appendChild(option);
+            }
+        } else if (this.video.audioTracks && this.video.audioTracks.length > 1) {
+            this.audioBtn.style.display = 'flex';
             for (let i = 0; i < this.video.audioTracks.length; i++) {
                 const track = this.video.audioTracks[i];
                 const option = document.createElement('button');
                 option.className = 'audio-option';
-                if (track.enabled) {
-                    option.classList.add('active');
-                }
+                if (track.enabled) option.classList.add('active');
 
-                // Add checkmark for active track
                 const checkmark = track.enabled ? '✓ ' : '&nbsp;&nbsp;';
                 const label = track.label || track.language || `Track ${i + 1}`;
                 option.innerHTML = `<span>${checkmark}</span>${label}`;
@@ -619,7 +630,6 @@ class StreamFlowPlayer {
                     e.stopPropagation();
                     this.setAudioTrack(i);
                 });
-
                 this.audioList.appendChild(option);
             }
         } else {
@@ -629,15 +639,14 @@ class StreamFlowPlayer {
     }
 
     setAudioTrack(index) {
-        if (!this.video.audioTracks || index >= this.video.audioTracks.length) return;
-
-        for (let i = 0; i < this.video.audioTracks.length; i++) {
-            this.video.audioTracks[i].enabled = (i === index);
+        if (this.hls && this.hls.audioTracks) {
+            this.hls.audioTrack = index;
+        } else if (this.video.audioTracks && index < this.video.audioTracks.length) {
+            for (let i = 0; i < this.video.audioTracks.length; i++) {
+                this.video.audioTracks[i].enabled = (i === index);
+            }
         }
-
-        // Update UI
         this.initAudioTracks();
-
         this.audioMenu.classList.remove('active');
     }
 
@@ -835,18 +844,19 @@ class StreamFlowPlayer {
             this.video.load();
         } else if (typeof Hls !== 'undefined') {
             // Use hls.js for other browsers
-            const hls = new Hls({
+            this.hls = new Hls({
                 maxBufferLength: 60,
                 maxMaxBufferLength: 120,
                 maxBufferSize: 60 * 1000 * 1000, // 60MB
                 maxBufferHole: 0.5,
             });
-            hls.loadSource(url);
-            hls.attachMedia(this.video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            this.hls.loadSource(url);
+            this.hls.attachMedia(this.video);
+            this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 this.hideLoading();
+                this.initAudioTracks();
             });
-            hls.on(Hls.Events.ERROR, (event, data) => {
+            this.hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) {
                     this.showError('HLS stream error: ' + data.type);
                 }
@@ -912,6 +922,9 @@ class StreamFlowPlayer {
         const pos = (e.clientX - rect.left) / rect.width;
         const clampedPos = Math.max(0, Math.min(1, pos));
         this.seekToTime(clampedPos * this.video.duration);
+        if (this.video.paused) {
+            this.video.play().catch(e => console.error('Play error after seek:', e));
+        }
     }
     
     seekToTime(targetTime) {
@@ -1222,25 +1235,11 @@ class StreamFlowPlayer {
 
         const savedTime = localStorage.getItem(movieId);
         if (savedTime && parseFloat(savedTime) > 5) {
-            if (this.resumeTime) this.resumeTime.textContent = this.formatTime(parseFloat(savedTime));
-            if (this.resumePrompt) this.resumePrompt.classList.add('active');
-
-            if (this.resumeBtnYes) this.resumeBtnYes.onclick = () => {
-                this.seekToTime(parseFloat(savedTime));
-                this.video.play();
-                if (this.resumePrompt) this.resumePrompt.classList.remove('active');
-            };
-
-            if (this.resumeBtnNo) this.resumeBtnNo.onclick = () => {
-                localStorage.removeItem(movieId);
-                this.video.currentTime = 0;
-                this.video.play();
-                if (this.resumePrompt) this.resumePrompt.classList.remove('active');
-            };
-
-            setTimeout(() => {
-                if (this.resumePrompt) this.resumePrompt.classList.remove('active');
-            }, 10000);
+            this.seekToTime(parseFloat(savedTime));
+            if (this.video.paused) {
+                this.video.play().catch(e => console.error('Auto-resume play error:', e));
+            }
+            if (this.resumePrompt) this.resumePrompt.classList.remove('active');
         }
     }
 
