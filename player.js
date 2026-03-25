@@ -652,31 +652,23 @@ class StreamFlowPlayer {
 
     async handleShare() {
         const urlToShare = this.urlInput.value.trim() || this.originalUrl;
-        if (!urlToShare || urlToShare.startsWith('?v=')) {
+
+        if (!urlToShare) {
             navigator.clipboard.writeText(window.location.href).catch(()=>{});
             this.showToast('Link Copied');
             return;
         }
 
+        // Generate ?url= encoded string
+        const encodedUrl = encodeURIComponent(urlToShare);
+        const shareLink = `${window.location.origin}/?url=${encodedUrl}`;
+
         try {
-            const response = await fetch('/api/share', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: urlToShare })
-            });
-
-            if (!response.ok) throw new Error('Failed to generate link');
-            const data = await response.json();
-            const shareLink = `${window.location.origin}/?v=${data.token}`;
-
             await navigator.clipboard.writeText(shareLink);
             this.showToast('Link Copied');
-        } catch (e) {
+        } catch(e) {
             console.error('Share error:', e);
-            const fallbackToken = btoa(urlToShare);
-            const fallbackLink = `${window.location.origin}/?v=${fallbackToken}`;
-            navigator.clipboard.writeText(fallbackLink).catch(()=>{});
-            this.showToast('Link Copied (Base64)');
+            this.showToast('Failed to copy link');
         }
     }
 
