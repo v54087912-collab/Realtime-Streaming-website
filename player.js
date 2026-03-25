@@ -32,6 +32,14 @@ class StreamFlowPlayer {
         this.audioMenu = document.getElementById('audioMenu');
         this.audioList = document.getElementById('audioList');
 
+        // Share & Toast
+        this.shareBtn = document.getElementById('shareBtn');
+        this.toastContainer = document.getElementById('toastContainer');
+        this.resumePrompt = document.getElementById('resumePrompt');
+        this.resumeTime = document.getElementById('resumeTime');
+        this.resumeBtnYes = document.getElementById('resumeBtnYes');
+        this.resumeBtnNo = document.getElementById('resumeBtnNo');
+
         // Download
         this.downloadBtn = document.getElementById('downloadBtn');
         this.downloadMenu = document.getElementById('downloadMenu');
@@ -91,6 +99,7 @@ class StreamFlowPlayer {
         this.targetBufferAhead = 60; // seconds to buffer ahead
         this.historyBufferRatio = 0.10; // 10% of watched video as history buffer
         this.maxWatchedPosition = 0; // track furthest watched position
+        this.lastSaveTime = 0;
         this.bufferRanges = []; // store all buffer ranges for visualization
         
         // Network speed tracking
@@ -127,6 +136,19 @@ class StreamFlowPlayer {
         // Check for URL in query params
         const params = new URLSearchParams(window.location.search);
         const videoUrl = params.get('url');
+        const tokenUrl = params.get('v');
+
+        if (tokenUrl) {
+            // Secure masked token playback
+            this.originalUrl = `?v=${tokenUrl}`;
+            this.currentUrl = `/api/share?v=${tokenUrl}`;
+            this.hideError();
+            this.showPlayerSection();
+            this.showLoading();
+            // Load the stream directly from our backend resolver API to prevent leaking the URL
+            this.loadDirectVideo(this.currentUrl);
+            return;
+        }
         if (videoUrl) {
             this.urlInput.value = decodeURIComponent(videoUrl);
             this.loadVideo();
@@ -191,6 +213,11 @@ class StreamFlowPlayer {
         this.skipBackBtn.addEventListener('click', () => this.skip(-10));
         this.skipForwardBtn.addEventListener('click', () => this.skip(10));
         
+        // Share
+        if (this.shareBtn) {
+            this.shareBtn.addEventListener('click', () => this.handleShare());
+        }
+
         // Volume
         this.muteBtn.addEventListener('click', () => this.toggleMute());
         this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
@@ -485,6 +512,8 @@ class StreamFlowPlayer {
             this.updateSpeedStatus();
             // Initialize Audio Tracks
             this.initAudioTracks();
+            // Check Resume
+            this.checkResume();
             
             console.log(`Video loaded: ${this.formatTime(this.video.duration)} duration`);
         });
@@ -521,21 +550,30 @@ class StreamFlowPlayer {
             this.isPlaying = false;
             this.playerContainer.classList.remove('playing');
             this.playOverlay.classList.remove('hidden');
+
+            const movieId = this.getMovieId();
+            if (movieId) localStorage.removeItem(movieId);
         });
         
         // Time update
         this.video.addEventListener('timeupdate', () => {
             this.updateProgress();
-            // Track max watched position for history buffer
+
             if (this.video.currentTime > this.maxWatchedPosition) {
                 this.maxWatchedPosition = this.video.currentTime;
             }
 
-            // A-B Repeat logic
             if (this.timeB !== null && this.timeA !== null) {
                 if (this.video.currentTime >= this.timeB) {
                     this.video.currentTime = this.timeA;
                 }
+            }
+
+            // Save progress every 5 seconds
+            const now = Date.now();
+            if (now - this.lastSaveTime > 5000) {
+                this.saveProgress();
+                this.lastSaveTime = now;
             }
         });
         
@@ -601,6 +639,36 @@ class StreamFlowPlayer {
         this.initAudioTracks();
 
         this.audioMenu.classList.remove('active');
+    }
+
+    async handleShare() {
+        const urlToShare = this.urlInput.value.trim() || this.originalUrl;
+        if (!urlToShare || urlToShare.startsWith('?v=')) {
+            navigator.clipboard.writeText(window.location.href).catch(()=>{});
+            this.showToast('Link Copied');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/share', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlToShare })
+            });
+
+            if (!response.ok) throw new Error('Failed to generate link');
+            const data = await response.json();
+            const shareLink = `${window.location.origin}/?v=${data.token}`;
+
+            await navigator.clipboard.writeText(shareLink);
+            this.showToast('Link Copied');
+        } catch (e) {
+            console.error('Share error:', e);
+            const fallbackToken = btoa(urlToShare);
+            const fallbackLink = `${window.location.origin}/?v=${fallbackToken}`;
+            navigator.clipboard.writeText(fallbackLink).catch(()=>{});
+            this.showToast('Link Copied (Base64)');
+        }
     }
 
     downloadVideo(quality) {
@@ -1132,6 +1200,60 @@ class StreamFlowPlayer {
     }
     
     // Smart buffer management - continues buffering when paused
+    getMovieId() {
+        if (this.originalUrl && this.originalUrl.startsWith('?v=')) {
+            return 'streamflow_progress_' + this.originalUrl.substring(3);
+        }
+        const url = this.urlInput ? this.urlInput.value.trim() : '';
+        if (!url) return null;
+
+        let hash = 0;
+        for (let i = 0; i < url.length; i++) {
+            const char = url.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return 'streamflow_progress_' + Math.abs(hash);
+    }
+
+    checkResume() {
+        const movieId = this.getMovieId();
+        if (!movieId) return;
+
+        const savedTime = localStorage.getItem(movieId);
+        if (savedTime && parseFloat(savedTime) > 5) {
+            if (this.resumeTime) this.resumeTime.textContent = this.formatTime(parseFloat(savedTime));
+            if (this.resumePrompt) this.resumePrompt.classList.add('active');
+
+            if (this.resumeBtnYes) this.resumeBtnYes.onclick = () => {
+                this.seekToTime(parseFloat(savedTime));
+                this.video.play();
+                if (this.resumePrompt) this.resumePrompt.classList.remove('active');
+            };
+
+            if (this.resumeBtnNo) this.resumeBtnNo.onclick = () => {
+                localStorage.removeItem(movieId);
+                this.video.currentTime = 0;
+                this.video.play();
+                if (this.resumePrompt) this.resumePrompt.classList.remove('active');
+            };
+
+            setTimeout(() => {
+                if (this.resumePrompt) this.resumePrompt.classList.remove('active');
+            }, 10000);
+        }
+    }
+
+    saveProgress() {
+        if (!this.isPlaying || !this.video.duration) return;
+        const movieId = this.getMovieId();
+        if (!movieId) return;
+
+        if (this.video.currentTime > 5 && this.video.currentTime < this.video.duration - 5) {
+            localStorage.setItem(movieId, this.video.currentTime);
+        }
+    }
+
     startBufferManagement() {
         // Clear any existing interval
         if (this.bufferCheckInterval) {
@@ -1550,6 +1672,18 @@ class StreamFlowPlayer {
         this.urlInput.focus();
     }
     
+    showToast(message) {
+        if (!this.toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> ${message}`;
+        this.toastContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
     formatTime(seconds) {
         if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
         

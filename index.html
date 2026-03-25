@@ -239,6 +239,13 @@
                             </div>
 
                             <div class="controls-right">
+                                <!-- Share -->
+                                <button class="ctrl-btn" id="shareBtn" title="Share">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M18 8A3 3 0 1 0 18 2a3 3 0 0 0 0 6ZM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
                                 <!-- Audio Tracks -->
                                 <div class="audio-container">
                                     <button class="ctrl-btn" id="audioBtn" title="Audio Tracks" style="display: none;">
@@ -403,6 +410,16 @@
                 <button class="close-shortcuts" id="closeShortcuts">Got it</button>
             </div>
         </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Resume Prompt -->
+    <div class="resume-prompt" id="resumePrompt">
+        <div class="resume-text">Resume from <span id="resumeTime">0:00</span>?</div>
+        <button class="resume-btn" id="resumeBtnYes">Resume</button>
+        <button class="resume-btn-sec" id="resumeBtnNo">Start Over</button>
     </div>
 
     <script src="player.js"></script>
