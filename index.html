@@ -239,6 +239,42 @@
                             </div>
 
                             <div class="controls-right">
+                                <!-- Share -->
+                                <button class="ctrl-btn" id="shareBtn" title="Share">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M18 8A3 3 0 1 0 18 2a3 3 0 0 0 0 6ZM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <!-- Audio Tracks -->
+                                <div class="audio-container">
+                                    <button class="ctrl-btn" id="audioBtn" title="Audio Tracks" style="display: none;">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 3v18M8 8v8M16 6v12M4 11v2M20 10v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </button>
+                                    <div class="audio-menu" id="audioMenu">
+                                        <div class="audio-list" id="audioList">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Download -->
+                                <div class="download-container">
+                                    <button class="ctrl-btn" id="downloadBtn" title="Download">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                    <div class="download-menu" id="downloadMenu">
+                                        <div class="download-options" id="downloadOptions">
+                                            <button class="download-option" data-quality="1080p">1080p</button>
+                                            <button class="download-option" data-quality="720p">720p</button>
+                                            <button class="download-option" data-quality="480p">480p</button>
+                                            <button class="download-option" data-quality="original">Original</button>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Playback Speed -->
                                 <div class="speed-container">
                                     <button class="ctrl-btn speed-btn" id="speedBtn" title="Playback Speed">
@@ -374,6 +410,16 @@
                 <button class="close-shortcuts" id="closeShortcuts">Got it</button>
             </div>
         </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Resume Prompt -->
+    <div class="resume-prompt" id="resumePrompt">
+        <div class="resume-text">Resume from <span id="resumeTime">0:00</span>?</div>
+        <button class="resume-btn" id="resumeBtnYes">Resume</button>
+        <button class="resume-btn-sec" id="resumeBtnNo">Start Over</button>
     </div>
 
     <script src="player.js"></script>
